@@ -1,0 +1,19 @@
+[general]
+name=Evidence Mapper
+qgisMinimumVersion=3.28
+description=Publication-ready study-distribution maps (bubble or choropleth) for literature reviews, systematic reviews and evidence-gap maps.
+version=1.0.0
+author=SANYAM DADHICH
+email=sanyamdadhich.rs.min26@itbhu.ac.in
+about=Evidence Mapper turns a table of included studies (CSV, Excel, GeoPackage, Shapefile or a layer in your project) into a journal-style figure in the QGIS print layout: area-proportional circles or a country/state choropleth, numbered key, category legend, circle-size legend, scale bar, north arrow, graticule, locator inset and an automatic footnote for studies that cannot be mapped. Works for the whole world, a region, or any country. Locations can come from coordinates, country names/ISO codes, state/province names or geocoded place names. Choose among 11 built-in basemaps (CARTO, Esri, OpenStreetMap, OpenTopoMap) or use any raster layer in your project (e.g. QuickMapServices). Exports PNG/PDF/SVG/TIFF at up to 1200 dpi together with the aggregated data and a suggested figure caption. Settings can be saved for exact reproducibility. Bundled data: Natural Earth (public domain).
+tracker=https://github.com/sanyamdadhichrsmin26-code/evidence_mapper/issues
+repository=https://github.com/sanyamdadhichrsmin26-code/evidence_mapper
+homepage=https://github.com/sanyamdadhichrsmin26-code/evidence_mapper
+category=Plugins
+icon=icon.png
+tags=literature review,systematic review,evidence map,bubble map,choropleth,layout,cartography,publication,scientific figure
+experimental=False
+deprecated=False
+hasProcessingProvider=no
+changelog=1.0.0
+    - First stable release.

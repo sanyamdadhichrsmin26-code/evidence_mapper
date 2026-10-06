@@ -1,0 +1,247 @@
+StudyID,Country,Design,Year
+W001,China,Cross-sectional,2013
+W002,India,Modelling,2018
+W003,Egypt,Cross-sectional,2010
+W004,India,Randomised trial,2019
+W005,India,Randomised trial,2024
+W006,China,Cross-sectional,2021
+W007,China,Modelling,2024
+W008,Ghana,Cohort,2014
+W009,Kenya,Randomised trial,2018
+W010,Pakistan,Modelling,2017
+W011,Bangladesh,Cohort,2010
+W012,United Kingdom,Qualitative,2014
+W013,United States,Cross-sectional,2020
+W014,Germany,Qualitative,2013
+W015,Germany,Modelling,2022
+W016,Mexico,Cross-sectional,2023
+W017,China,Cross-sectional,2019
+W018,Canada,Qualitative,2017
+W019,Indonesia,Cross-sectional,2020
+W020,India,Modelling,2025
+W021,China,Cohort,2020
+W022,Pakistan,Randomised trial,2021
+W023,Bangladesh,Cross-sectional,2018
+W024,India,Randomised trial,2014
+W025,United Kingdom,Qualitative,2018
+W026,India,Qualitative,2021
+W027,"Korea, Republic of",Randomised trial,2014
+W028,Kenya,Cohort,2014
+W029,Pakistan,Modelling,2010
+W030,Australia,Qualitative,2012
+W031,Germany,Cohort,2023
+W032,Australia,Cross-sectional,2016
+W033,Nigeria,Cross-sectional,2016
+W034,Bangladesh,Cohort,2015
+W035,United States,Cross-sectional,2015
+W036,Argentina,Cross-sectional,2012
+W037,Brazil,Cohort,2014
+W038,Brazil,Modelling,2010
+W039,Canada,Randomised trial,2022
+W040,Not reported,Cohort,2025
+W041,Ethiopia,Modelling,2020
+W042,Kenya; United States,Qualitative,2010
+W043,Japan,Cohort,2024
+W044,India,Cross-sectional,2012
+W045,Russian Federation,Cohort,2024
+W046,Germany,Modelling,2021
+W047,Australia,Cross-sectional,2025
+W048,China,Cross-sectional,2022
+W049,Viet Nam,Cross-sectional,2016
+W050,Indonesia,Cross-sectional,2011
+W051,Ghana,Qualitative,2025
+W052,Multiple countries,Randomised trial,2020
+W053,India,Cross-sectional,2025
+W054,Germany,Cohort,2017
+W055,Brazil,Cohort,2024
+W056,Australia,Cross-sectional,2010
+W057,Brazil,Randomised trial,2013
+W058,Multiple countries,Qualitative,2020
+W059,Canada,Cross-sectional,2011
+W060,Nepal,Randomised trial,2011
+W061,Ivory Coast,Modelling,2011
+W062,Myanmar (Burma),Qualitative,2016
+W063,Egypt,Cross-sectional,2012
+W064,India,Modelling,2014
+W065,Global,Cross-sectional,2014
+W066,South Africa,Randomised trial,2016
+W067,Not reported,Randomised trial,2025
+W068,India,Cross-sectional,2016
+W069,Canada,Randomised trial,2018
+W070,Brazil,Cross-sectional,2016
+W071,Russian Federation,Modelling,2019
+W072,Canada,Cross-sectional,2014
+W073,Egypt,Qualitative,2012
+W074,United Kingdom,Cross-sectional,2017
+W075,Canada,Cross-sectional,2021
+W076,India,Cohort,2021
+W077,Pakistan,Randomised trial,2011
+W078,Nigeria,Cross-sectional,2019
+W079,Nigeria,Qualitative,2010
+W080,Myanmar (Burma),Randomised trial,2014
+W081,India,Cohort,2022
+W082,United States,Cross-sectional,2017
+W083,United Kingdom,Cross-sectional,2022
+W084,Nigeria,Cross-sectional,2010
+W085,Indonesia,Randomised trial,2017
+W086,Indonesia,Modelling,2015
+W087,India,Cohort,2010
+W088,Japan,Qualitative,2016
+W089,Ivory Coast,Cross-sectional,2017
+W090,Australia,Qualitative,2025
+W091,United States,Cross-sectional,2020
+W092,United Kingdom,Modelling,2016
+W093,Not reported,Randomised trial,2015
+W094,India,Cross-sectional,2024
+W095,India,Cohort,2025
+W096,Bangladesh,Cross-sectional,2025
+W097,United States,Qualitative,2012
+W098,United States,Cross-sectional,2016
+W099,South Africa,Modelling,2011
+W100,Brazil,Cross-sectional,2014
+W101,China,Qualitative,2019
+W102,India,Cross-sectional,2024
+W103,United Kingdom,Cross-sectional,2012
+W104,India,Qualitative,2020
+W105,Australia,Cohort,2025
+W106,China,Randomised trial,2014
+W107,China,Modelling,2012
+W108,China,Cross-sectional,2015
+W109,Brazil,Qualitative,2015
+W110,Nigeria,Cross-sectional,2024
+W111,Bangladesh,Qualitative,2012
+W112,China,Modelling,2011
+W113,China,Randomised trial,2022
+W114,India,Modelling,2021
+W115,India,Randomised trial,2015
+W116,Australia,Qualitative,2013
+W117,Australia,Cohort,2018
+W118,Not reported,Qualitative,2021
+W119,Pakistan,Modelling,2022
+W120,United States,Qualitative,2021
+W121,Global,Cohort,2018
+W122,Kenya,Randomised trial,2015
+W123,Global,Randomised trial,2021
+W124,China,Modelling,2024
+W125,Viet Nam,Modelling,2011
+W126,Canada; Argentina,Randomised trial,2016
+W127,Pakistan; Russian Federation,Cross-sectional,2019
+W128,Peru,Cross-sectional,2016
+W129,India,Qualitative,2014
+W130,Multiple countries,Randomised trial,2020
+W131,United States,Modelling,2021
+W132,South Africa,Cohort,2023
+W133,Indonesia,Cross-sectional,2017
+W134,Nigeria,Cross-sectional,2012
+W135,South Africa,Modelling,2021
+W136,Global,Modelling,2018
+W137,India,Randomised trial,2012
+W138,China,Cross-sectional,2016
+W139,Mexico,Cross-sectional,2022
+W140,South Africa,Cohort,2017
+W141,Mexico,Cross-sectional,2017
+W142,Brazil,Cross-sectional,2012
+W143,Kenya,Modelling,2018
+W144,Viet Nam,Cohort,2010
+W145,Canada,Modelling,2014
+W146,China,Modelling,2021
+W147,India,Qualitative,2022
+W148,United States,Qualitative,2017
+W149,China,Qualitative,2018
+W150,Indonesia,Modelling,2023
+W151,Ethiopia,Cohort,2019
+W152,Ghana,Qualitative,2014
+W153,Indonesia,Randomised trial,2013
+W154,Brazil,Modelling,2014
+W155,Peru,Randomised trial,2022
+W156,China,Qualitative,2018
+W157,Russian Federation,Cross-sectional,2019
+W158,Germany,Cohort,2014
+W159,Germany,Modelling,2017
+W160,China,Cohort,2010
+W161,Russian Federation; Nigeria,Randomised trial,2016
+W162,China,Cross-sectional,2012
+W163,China,Modelling,2022
+W164,Not reported,Cross-sectional,2014
+W165,Kenya; Canada,Randomised trial,2024
+W166,Kenya,Modelling,2013
+W167,United Kingdom,Qualitative,2023
+W168,United States,Modelling,2016
+W169,United States,Modelling,2022
+W170,Canada,Modelling,2019
+W171,Australia,Cross-sectional,2014
+W172,United States,Cross-sectional,2016
+W173,Mexico,Randomised trial,2016
+W174,United States,Modelling,2018
+W175,United States,Modelling,2013
+W176,United States,Cross-sectional,2025
+W177,Brazil,Cross-sectional,2021
+W178,Australia,Cross-sectional,2020
+W179,United Kingdom,Modelling,2014
+W180,China,Cohort,2018
+W181,China,Cross-sectional,2022
+W182,"Korea, Republic of",Cohort,2017
+W183,Türkiye,Cohort,2010
+W184,United Kingdom,Randomised trial,2019
+W185,Japan,Modelling,2017
+W186,Viet Nam,Cohort,2015
+W187,China,Randomised trial,2012
+W188,Indonesia,Modelling,2018
+W189,Australia,Qualitative,2024
+W190,Australia,Cross-sectional,2013
+W191,Ethiopia,Cohort,2015
+W192,Japan,Randomised trial,2019
+W193,India,Modelling,2023
+W194,Ethiopia,Randomised trial,2021
+W195,China,Modelling,2021
+W196,Nigeria,Cross-sectional,2012
+W197,Kenya,Randomised trial,2017
+W198,South Africa,Modelling,2015
+W199,Indonesia,Cohort,2015
+W200,"Korea, Republic of",Cross-sectional,2019
+W201,India,Qualitative,2012
+W202,Nepal,Cross-sectional,2014
+W203,Ghana,Randomised trial,2023
+W204,Global,Randomised trial,2012
+W205,"Korea, Republic of",Cross-sectional,2022
+W206,China,Randomised trial,2013
+W207,Brazil,Randomised trial,2022
+W208,Germany,Cross-sectional,2025
+W209,Australia,Randomised trial,2013
+W210,United States,Cross-sectional,2021
+W211,United States,Cohort,2025
+W212,China,Cross-sectional,2013
+W213,Viet Nam,Cohort,2019
+W214,United States,Cross-sectional,2010
+W215,Mexico,Modelling,2013
+W216,Argentina,Qualitative,2025
+W217,India,Cross-sectional,2013
+W218,India,Cohort,2017
+W219,United States,Cohort,2016
+W220,India,Randomised trial,2024
+W221,Japan,Cross-sectional,2022
+W222,United States,Randomised trial,2013
+W223,Türkiye,Cohort,2011
+W224,Australia,Modelling,2011
+W225,South Africa,Modelling,2016
+W226,India,Cross-sectional,2018
+W227,Bangladesh,Cross-sectional,2012
+W228,Nepal,Cohort,2019
+W229,South Africa,Modelling,2023
+W230,South Africa,Modelling,2014
+W231,India,Qualitative,2022
+W232,South Africa,Qualitative,2020
+W233,United States,Cross-sectional,2010
+W234,United States,Cross-sectional,2021
+W235,Peru,Randomised trial,2018
+W236,Nigeria; Viet Nam,Cohort,2016
+W237,India,Cross-sectional,2021
+W238,Russian Federation,Randomised trial,2015
+W239,China,Cross-sectional,2015
+W240,Not reported,Qualitative,2022
+W241,Not reported,Qualitative,2022
+W242,China,Cross-sectional,2020
+W243,South Africa,Cross-sectional,2010
+W244,Argentina,Cohort,2012
+W245,Brazil,Cross-sectional,2025
+W246,Türkiye,Randomised trial,2012
