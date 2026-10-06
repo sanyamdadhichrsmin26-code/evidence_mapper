@@ -21,7 +21,7 @@ legends + scale bar + north arrow + locator inset + footnote) as a QGIS print la
 - Everything remains editable in the QGIS layout designer.
 
 ## Install
-**From a zip:** `Plugins ▸ Manage and Install Plugins ▸ Install from ZIP` → choose `evidence_mapper-1.0.0.zip`.
+**From a zip:** `Plugins ▸ Manage and Install Plugins ▸ Install from ZIP` → choose `evidence_mapper-1.0.1.zip`.
 **From the official repository** (after publication): search for *Evidence Mapper*.
 
 ## Quick start

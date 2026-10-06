@@ -448,10 +448,10 @@ def build_layout(project, name, ctx):
                 if show_key:
                     parts.append(key_height(ctx, 10 ** 6))
                 return sum(parts) + 3.0 * max(0, len(parts) - 1)
+            corner_inset = False
             if use_inset and need(True) > avail:
                 use_inset = False
-                warnings.append("The locator inset was left out because the side panel had no room for it "
-                                "(use a larger page, fewer categories or a bottom panel).")
+                corner_inset = True          # fall back to a small inset inside the map corner
             yy = py
             if use_inset:
                 yy += box_inset(layout, ctx, mp, px, yy, panel_w, inset_h) + 3.0
@@ -459,6 +459,10 @@ def build_layout(project, name, ctx):
                 reserve = sum(other_h) + 3.0 * len(other_h)
                 hmax = max(18.0, avail - (yy - py) - reserve)
                 yy += box_key(layout, ctx, px, yy, panel_w, hmax, show_ids=not choropleth) + 3.0
+            if corner_inset:
+                iw = max(30.0, 0.30 * mw)
+                ih = iw * 0.5
+                box_inset(layout, ctx, mp, mx + mw - iw - 2.0, my + mh - ih - 2.0, iw, ih)
             if not below:
                 for kind, hh, ww in legend_items:
                     if kind == "ramp":

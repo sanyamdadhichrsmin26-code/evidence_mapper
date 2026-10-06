@@ -269,10 +269,10 @@ def build_map(cfg, table=None, agg=None, geocoder=None, progress=None, is_cancel
                     basemap.hueSaturationFilter().setSaturation(-100)
                 except Exception:
                     pass
-    world_scale = is_global or ext4326.width() > 150
+    world_scale = is_global or ext4326.width() > 60 or ext4326.height() > 60
     graticule_layer = False
     if st.graticule and world_scale:
-        gl = styling.build_graticule_layer(30 if ext4326.width() > 250 else 15)
+        gl = styling.build_graticule_layer(30 if ext4326.width() > 250 else (15 if ext4326.width() > 110 else 10))
         layers.append(gl)
         graticule_layer = True
     if st.show_countries:
