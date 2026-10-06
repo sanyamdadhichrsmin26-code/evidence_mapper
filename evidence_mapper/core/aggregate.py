@@ -2,7 +2,6 @@
 import re
 from collections import Counter
 
-from qgis.core import QgsPointXY
 
 from .tables import to_float
 
@@ -46,7 +45,7 @@ class AggResult:
 
     @property
     def total_value(self):
-        return sum(l.value for l in self.locs)
+        return sum(lc.value for lc in self.locs)
 
 
 def _split(cell, split_multi):
@@ -185,17 +184,17 @@ def aggregate(table, opt, gaz, geocoder=None, progress=None, is_canceled=None):
 
     # ---- finalise
     out = list(locs.values())
-    for l in out:
-        if l.kind == "point" and l._n_pts > 1:       # mean of coordinates for named sites
-            l.lon, l.lat = l._lon_sum / l._n_pts, l._lat_sum / l._n_pts
-    names = Counter(l.name for l in out)
-    for l in out:                     # disambiguate e.g. Punjab (India) / Punjab (Pakistan)
-        if l.kind == "admin1" and names[l.name] > 1 and l.adm0 in gaz.by_a3:
-            l.name = "%s (%s)" % (l.name, gaz.by_a3[l.adm0]["name"])
-    out.sort(key=lambda l: (-l.value, l.name.casefold()))
-    for i, l in enumerate(out, 1):
-        l.id = i
-        res.group_totals[l.group] += l.value
+    for lc in out:
+        if lc.kind == "point" and lc._n_pts > 1:       # mean of coordinates for named sites
+            lc.lon, lc.lat = lc._lon_sum / lc._n_pts, lc._lat_sum / lc._n_pts
+    names = Counter(lc.name for lc in out)
+    for lc in out:                     # disambiguate e.g. Punjab (India) / Punjab (Pakistan)
+        if lc.kind == "admin1" and names[lc.name] > 1 and lc.adm0 in gaz.by_a3:
+            lc.name = "%s (%s)" % (lc.name, gaz.by_a3[lc.adm0]["name"])
+    out.sort(key=lambda lc: (-lc.value, lc.name.casefold()))
+    for i, lc in enumerate(out, 1):
+        lc.id = i
+        res.group_totals[lc.group] += lc.value
     res.locs = out
     if mode == "latlon" and not opt.name_field:
         res.messages.append("No name column chosen: rows are merged by identical coordinates "

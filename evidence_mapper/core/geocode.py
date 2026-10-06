@@ -11,6 +11,8 @@ from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtNetwork import QNetworkRequest
 from qgis.core import QgsApplication, QgsBlockingNetworkRequest
 
+from .util import log
+
 USER_AGENT = b"QGIS-EvidenceMapper/1.0 (QGIS plugin; literature-review maps)"
 
 
@@ -31,8 +33,8 @@ class Geocoder:
             os.makedirs(os.path.dirname(self.cache_path), exist_ok=True)
             with open(self.cache_path, "w", encoding="utf-8") as fh:
                 json.dump(self.cache, fh, ensure_ascii=False)
-        except Exception:
-            pass
+        except OSError as exc:
+            log("Geocode cache not saved: %s" % exc)
 
     def is_cached(self, query):
         return query.strip().lower() in self.cache
@@ -53,7 +55,7 @@ class Geocoder:
         blocking = QgsBlockingNetworkRequest()
         err = blocking.get(req, False)
         self._last = time.time()
-        if err != QgsBlockingNetworkRequest.NoError:
+        if err != QgsBlockingNetworkRequest.ErrorCode.NoError:
             raise RuntimeError("Geocoding service unreachable: %s" % blocking.errorMessage())
         try:
             data = json.loads(bytes(blocking.reply().content()).decode("utf-8"))

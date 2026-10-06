@@ -57,8 +57,8 @@ class Ctx:
 
 
 # ------------------------------------------------------------------ primitives
-def label(layout, text, x, y, w, h, pt=8, bold=False, italic=False, color=INK, h_align=Qt.AlignLeft,
-          v_align=Qt.AlignVCenter, font="Arial"):
+def label(layout, text, x, y, w, h, pt=8, bold=False, italic=False, color=INK, h_align=Qt.AlignmentFlag.AlignLeft,
+          v_align=Qt.AlignmentFlag.AlignVCenter, font="Arial"):
     lb = QgsLayoutItemLabel(layout)
     lb.setText(text)
     f = QFont(font)
@@ -77,7 +77,7 @@ def label(layout, text, x, y, w, h, pt=8, bold=False, italic=False, color=INK, h
 
 def frame_box(layout, x, y, w, h, stroke="#333333", width=0.3, fill="255,255,255,0"):
     sh = QgsLayoutItemShape(layout)
-    sh.setShapeType(QgsLayoutItemShape.Rectangle)
+    sh.setShapeType(QgsLayoutItemShape.Shape.Rectangle)
     sh.setSymbol(QgsFillSymbol.createSimple({"color": fill, "outline_color": stroke,
                                              "outline_width": str(width)}))
     sh.attemptSetSceneRect(QRectF(x, y, w, h))
@@ -87,7 +87,7 @@ def frame_box(layout, x, y, w, h, stroke="#333333", width=0.3, fill="255,255,255
 
 def circle(layout, cx, cy, d, fill, stroke="#2b2b2b", width=0.2):
     sh = QgsLayoutItemShape(layout)
-    sh.setShapeType(QgsLayoutItemShape.Ellipse)
+    sh.setShapeType(QgsLayoutItemShape.Shape.Ellipse)
     sh.setSymbol(QgsFillSymbol.createSimple({"color": fill, "outline_color": stroke,
                                              "outline_width": str(width)}))
     sh.attemptSetSceneRect(QRectF(cx - d / 2.0, cy - d / 2.0, d, d))
@@ -97,7 +97,7 @@ def circle(layout, cx, cy, d, fill, stroke="#2b2b2b", width=0.2):
 
 def swatch(layout, x, y, w, h, color, stroke="#555555"):
     sh = QgsLayoutItemShape(layout)
-    sh.setShapeType(QgsLayoutItemShape.Rectangle)
+    sh.setShapeType(QgsLayoutItemShape.Shape.Rectangle)
     sh.setSymbol(QgsFillSymbol.createSimple({"color": color, "outline_color": stroke, "outline_width": "0.15"}))
     sh.attemptSetSceneRect(QRectF(x, y, w, h))
     layout.addLayoutItem(sh)
@@ -119,7 +119,7 @@ def groups_geom(ctx, w):
 
 def sizes_height(ctx):
     st = ctx.cfg.style
-    vals = legend_values(ctx.vmax, min(l.value for l in ctx.locs))
+    vals = legend_values(ctx.vmax, min(lc.value for lc in ctx.locs))
     big = max(size_for(v, ctx.vmax, st.max_size_mm, st.min_size_mm) for v in vals)
     return 6.0 + big + 6.5 + 2.0
 
@@ -157,15 +157,15 @@ def box_key(layout, ctx, x, y, w, hmax, show_ids=True):
     val_w = 8.5
     name_w = w - 2 * pad - id_w - val_w
     yy = y + head_h + pad - 0.5
-    for l in locs[:n]:
+    for lc in locs[:n]:
         if show_ids:
-            label(layout, str(l.id), x + pad, yy, id_w - 1.0, lh, pt=pt, bold=True, h_align=Qt.AlignRight, font=font)
-        nm = l.name if len(l.name) <= chars_fit(name_w, pt) else l.name[:chars_fit(name_w, pt) - 1] + "…"
+            label(layout, str(lc.id), x + pad, yy, id_w - 1.0, lh, pt=pt, bold=True, h_align=Qt.AlignmentFlag.AlignRight, font=font)
+        nm = lc.name if len(lc.name) <= chars_fit(name_w, pt) else lc.name[:chars_fit(name_w, pt) - 1] + "…"
         label(layout, nm, x + pad + id_w, yy, name_w, lh, pt=pt, font=font)
-        label(layout, _fmt(l.value), x + w - pad - val_w, yy, val_w, lh, pt=pt, h_align=Qt.AlignRight, font=font)
+        label(layout, _fmt(lc.value), x + w - pad - val_w, yy, val_w, lh, pt=pt, h_align=Qt.AlignmentFlag.AlignRight, font=font)
         yy += lh
     if extra > 0:
-        rest = sum(l.value for l in locs[n:])
+        rest = sum(lc.value for lc in locs[n:])
         label(layout, "+ %d more locations (%s)" % (extra, _fmt(rest)), x + pad + id_w, yy, w - 2 * pad - id_w,
               lh, pt=pt, italic=True, color=GREY, font=font)
     frame_box(layout, x, y, w, h)
@@ -211,7 +211,7 @@ def box_ramp(layout, ctx, x, y, w):
 def box_sizes(layout, ctx, x, y, w):
     st, lo = ctx.cfg.style, ctx.cfg.layout
     font = lo.font
-    vals = legend_values(ctx.vmax, min(l.value for l in ctx.locs))
+    vals = legend_values(ctx.vmax, min(lc.value for lc in ctx.locs))
     sizes = [size_for(v, ctx.vmax, st.max_size_mm, st.min_size_mm) for v in vals]
     pad = 2.0
     while len(vals) > 2 and sum(sizes) + 5 * (len(sizes) - 1) + 2 * pad > w:
@@ -226,7 +226,7 @@ def box_sizes(layout, ctx, x, y, w):
     base = y + head_h + big + 0.5
     for v, d in zip(vals, sizes):
         circle(layout, cx + d / 2.0, base - d / 2.0, d, _rgba("#9a9a9a", 0.35), stroke="#2b2b2b", width=0.25)
-        label(layout, _fmt(v), cx + d / 2.0 - 7, base + 0.8, 14, 4.5, pt=7.0, h_align=Qt.AlignHCenter, font=font)
+        label(layout, _fmt(v), cx + d / 2.0 - 7, base + 0.8, 14, 4.5, pt=7.0, h_align=Qt.AlignmentFlag.AlignHCenter, font=font)
         cx += d + 5
     frame_box(layout, x, y, w, h)
     return h
@@ -273,22 +273,22 @@ def add_graticule(main_map, ext4326, font, warnings):
         iv = nice_interval(min(ext4326.width(), ext4326.height() * 1.0) * 1.15)
         g.setIntervalX(iv)
         g.setIntervalY(iv)
-        g.setStyle(QgsLayoutItemMapGrid.Solid)
+        g.setStyle(QgsLayoutItemMapGrid.GridStyle.Solid)
         g.setLineSymbol(QgsLineSymbol.createSimple({"line_color": "120,120,120,110", "line_width": "0.12"}))
-        g.setFrameStyle(QgsLayoutItemMapGrid.NoFrame)
+        g.setFrameStyle(QgsLayoutItemMapGrid.FrameStyle.NoFrame)
         g.setAnnotationEnabled(True)
         f = QFont(font)
         f.setPointSizeF(6.5)
         g.setAnnotationFont(f)
-        g.setAnnotationFormat(QgsLayoutItemMapGrid.DecimalWithSuffix)
+        g.setAnnotationFormat(QgsLayoutItemMapGrid.AnnotationFormat.DecimalWithSuffix)
         g.setAnnotationPrecision(0 if iv >= 1 else (1 if iv >= 0.1 else 2))
         for side, direction, mode in (
-                (QgsLayoutItemMapGrid.Left, QgsLayoutItemMapGrid.Vertical, QgsLayoutItemMapGrid.LatitudeOnly),
-                (QgsLayoutItemMapGrid.Bottom, QgsLayoutItemMapGrid.Horizontal, QgsLayoutItemMapGrid.LongitudeOnly),
-                (QgsLayoutItemMapGrid.Top, QgsLayoutItemMapGrid.Horizontal, QgsLayoutItemMapGrid.LongitudeOnly),
-                (QgsLayoutItemMapGrid.Right, QgsLayoutItemMapGrid.Vertical, QgsLayoutItemMapGrid.LatitudeOnly)):
+                (QgsLayoutItemMapGrid.BorderSide.Left, QgsLayoutItemMapGrid.AnnotationDirection.Vertical, QgsLayoutItemMapGrid.DisplayMode.LatitudeOnly),
+                (QgsLayoutItemMapGrid.BorderSide.Bottom, QgsLayoutItemMapGrid.AnnotationDirection.Horizontal, QgsLayoutItemMapGrid.DisplayMode.LongitudeOnly),
+                (QgsLayoutItemMapGrid.BorderSide.Top, QgsLayoutItemMapGrid.AnnotationDirection.Horizontal, QgsLayoutItemMapGrid.DisplayMode.LongitudeOnly),
+                (QgsLayoutItemMapGrid.BorderSide.Right, QgsLayoutItemMapGrid.AnnotationDirection.Vertical, QgsLayoutItemMapGrid.DisplayMode.LatitudeOnly)):
             g.setAnnotationDisplay(mode, side)
-            g.setAnnotationPosition(QgsLayoutItemMapGrid.OutsideMapFrame, side)
+            g.setAnnotationPosition(QgsLayoutItemMapGrid.AnnotationPosition.OutsideMapFrame, side)
             g.setAnnotationDirection(direction, side)
         g.setAnnotationFrameDistance(1.2)
         g.setEnabled(True)
@@ -312,7 +312,7 @@ def _find_north_arrow_svg():
 
 
 def build_layout(project, name, ctx):
-    cfg, lo, st = ctx.cfg, ctx.cfg.layout, ctx.cfg.style
+    lo, st = ctx.cfg.layout, ctx.cfg.style
     warnings = []
     font = lo.font
 
@@ -323,7 +323,7 @@ def build_layout(project, name, ctx):
 
     pw, ph = PAGES.get(lo.page, PAGES["A4"])
     W, H = (max(pw, ph), min(pw, ph)) if lo.orientation == "landscape" else (min(pw, ph), max(pw, ph))
-    layout.pageCollection().page(0).setPageSize(QgsLayoutSize(W, H, QgsUnitTypes.LayoutMillimeters))
+    layout.pageCollection().page(0).setPageSize(QgsLayoutSize(W, H, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
 
     m = lo.margin_mm
     title_h, sub_h = 8.5, 5.0
@@ -376,10 +376,10 @@ def build_layout(project, name, ctx):
         try:
             sb = QgsLayoutItemScaleBar(layout)
             sb.setLinkedMap(mp)
-            sb.setUnits(QgsUnitTypes.DistanceKilometers)
+            sb.setUnits(QgsUnitTypes.DistanceUnit.DistanceKilometers)
             sb.setUnitLabel("km")
             sb.setStyle("Single Box")
-            sb.applyDefaultSize(QgsUnitTypes.DistanceKilometers)
+            sb.applyDefaultSize(QgsUnitTypes.DistanceUnit.DistanceKilometers)
             sb.setNumberOfSegmentsLeft(0)
             f = QFont(font)
             f.setPointSizeF(7)
@@ -388,7 +388,7 @@ def build_layout(project, name, ctx):
             sb.setBackgroundColor(QColor(255, 255, 255, 190))
             layout.addLayoutItem(sb)
             sb.attemptMove(QgsLayoutPoint(mx + 2.0, my + mh - 2.0 - sb.rect().height(),
-                                          QgsUnitTypes.LayoutMillimeters))
+                                          QgsUnitTypes.LayoutUnit.LayoutMillimeters))
         except Exception as exc:
             warnings.append("Scale bar could not be created (%s)." % exc)
 
@@ -398,7 +398,7 @@ def build_layout(project, name, ctx):
             na = QgsLayoutItemPicture(layout)
             na.setPicturePath(find_north_arrow())
             na.setLinkedMap(mp)
-            na.setNorthMode(QgsLayoutItemPicture.GridNorth)
+            na.setNorthMode(QgsLayoutItemPicture.NorthMode.GridNorth)
             na.attemptSetSceneRect(QRectF(mx + mw - 13.0, my + 2.0, 11.0, 13.0))
             layout.addLayoutItem(na)
         except Exception as exc:
@@ -477,7 +477,6 @@ def build_layout(project, name, ctx):
         else:  # bottom panel
             px, py = m, my + mh + ann + gap
             wtot = W - 2 * m
-            cols = []
             n_cols = 3 if (lo.show_inset and not ctx.is_global) else 2
             key_w = wtot * (0.42 if n_cols == 3 else 0.5)
             mid_w = wtot * (0.30 if n_cols == 3 else 0.5) - gap
@@ -501,7 +500,7 @@ def build_layout(project, name, ctx):
     fy = H - m - footer_h
     if lo.show_note and ctx.note:
         label(layout, ctx.note, m, fy, W - 2 * m, 5.5, pt=6.5, italic=True, color=INK, font=font,
-              v_align=Qt.AlignTop)
+              v_align=Qt.AlignmentFlag.AlignTop)
         fy += 5.0
     if lo.show_source:
         src = []
@@ -511,5 +510,5 @@ def build_layout(project, name, ctx):
         if ctx.mixed_any and not ctx.single_group:
             src.append("Where a location has studies in several categories, the most frequent one sets the colour.")
         src.append("Scale bar is valid at the map centre.")
-        label(layout, " ".join(src), m, fy, W - 2 * m, 5.5, pt=5.5, color=GREY, font=font, v_align=Qt.AlignTop)
+        label(layout, " ".join(src), m, fy, W - 2 * m, 5.5, pt=5.5, color=GREY, font=font, v_align=Qt.AlignmentFlag.AlignTop)
     return layout, warnings

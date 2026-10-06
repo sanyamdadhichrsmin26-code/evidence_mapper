@@ -12,11 +12,11 @@ from qgis.PyQt.QtWidgets import (
     QTableWidget, QTableWidgetItem, QGroupBox, QFileDialog, QMessageBox, QProgressDialog, QApplication,
     QSlider, QScrollArea, QWidget, QDialog, QPlainTextEdit, QDialogButtonBox, QButtonGroup, QFontComboBox,
     QAbstractItemView, QHeaderView)
-from qgis.core import (QgsProject, QgsMapLayerProxyModel, QgsCoordinateReferenceSystem, QgsCoordinateTransform,
-                       QgsRasterLayer, QgsVectorLayer, QgsApplication)
+from qgis.core import (QgsProject, QgsMapLayerProxyModel, QgsCoordinateReferenceSystem, QgsCoordinateTransform)
 from qgis.gui import QgsFileWidget, QgsMapLayerComboBox, QgsColorButton, QgsProjectionSelectionWidget
 
 from ..core import tables
+from ..core.util import log
 from ..core.aggregate import aggregate
 from ..core.basemaps import BASEMAPS
 from ..core.builder import build_map, get_gazetteer
@@ -76,7 +76,7 @@ class DataPage(_Page):
         self.sheet = _combo()
         self.sheet.setVisible(False)
         self.layer = QgsMapLayerComboBox()
-        self.layer.setFilters(QgsMapLayerProxyModel.VectorLayer)
+        self.layer.setFilters(QgsMapLayerProxyModel.Filter.VectorLayer)
         self.layer.setEnabled(False)
         lay.addWidget(self.r_file)
         lay.addWidget(self.file)
@@ -93,11 +93,11 @@ class DataPage(_Page):
         self.info.setWordWrap(True)
         lay.addWidget(self.info)
         self.preview = QTableWidget()
-        self.preview.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.preview.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         lay.addWidget(self.preview, 1)
         b = QPushButton("Save an example CSV template…")
         b.clicked.connect(self.save_template)
-        lay.addWidget(b, 0, Qt.AlignLeft)
+        lay.addWidget(b, 0, Qt.AlignmentFlag.AlignLeft)
 
         self.r_file.toggled.connect(self._toggle)
         self.file.fileChanged.connect(self._file_changed)
@@ -149,7 +149,7 @@ class DataPage(_Page):
                 for i in range(n):
                     for j, f in enumerate(t.fields):
                         self.preview.setItem(i, j, QTableWidgetItem(str(t.rows[i].get(f, ""))))
-                self.preview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+                self.preview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
             except Exception as exc:
                 self.info.setText("⚠ %s" % exc)
                 self.info.setStyleSheet("color:#b00020;")
@@ -218,13 +218,13 @@ class FieldsPage(_Page):
         lay.addWidget(self.geo)
         self.check_btn = QPushButton("Check mapping")
         self.check_btn.clicked.connect(lambda: self.run_check(True))
-        lay.addWidget(self.check_btn, 0, Qt.AlignLeft)
+        lay.addWidget(self.check_btn, 0, Qt.AlignmentFlag.AlignLeft)
         self.report = QLabel("")
         self.report.setWordWrap(True)
-        self.report.setTextFormat(Qt.RichText)
+        self.report.setTextFormat(Qt.TextFormat.RichText)
         lay.addWidget(self.report)
         self.result = QTableWidget()
-        self.result.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.result.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         lay.addWidget(self.result, 1)
         self.mode.currentIndexChanged.connect(self._mode_changed)
         self.val_mode.currentIndexChanged.connect(self._mode_changed)
@@ -335,7 +335,7 @@ class FieldsPage(_Page):
         if not self._required_ok(d):
             return False
         prog = QProgressDialog("Matching locations…", "Cancel", 0, 100, self)
-        prog.setWindowModality(Qt.WindowModal)
+        prog.setWindowModality(Qt.WindowModality.WindowModal)
         prog.setMinimumDuration(400)
         cancelled = {"v": False}
 
@@ -347,7 +347,7 @@ class FieldsPage(_Page):
             if prog.wasCanceled():
                 cancelled["v"] = True
 
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         try:
             agg = aggregate(self.wiz.table, d, get_gazetteer(), Geocoder() if d.loc_mode == "place" and d.geocode else None,
                             cb, lambda: cancelled["v"])
@@ -379,11 +379,11 @@ class FieldsPage(_Page):
         self.result.setColumnCount(4)
         self.result.setHorizontalHeaderLabels(["#", "Location", "Category", "Value"])
         self.result.setRowCount(len(agg.locs))
-        for i, l in enumerate(agg.locs):
-            vals = [str(l.id), l.name, l.group, ("%g" % l.value)]
+        for i, lc in enumerate(agg.locs):
+            vals = [str(lc.id), lc.name, lc.group, ("%g" % lc.value)]
             for j, v in enumerate(vals):
                 self.result.setItem(i, j, QTableWidgetItem(v))
-        self.result.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.result.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
 
     def validatePage(self):
         cfg = MapConfig()
@@ -448,10 +448,10 @@ class AreaPage(_Page):
         self.filter = QLineEdit()
         self.filter.setPlaceholderText("Type to filter countries…")
         self.clist = QListWidget()
-        self.clist.setSelectionMode(QAbstractItemView.MultiSelection)
+        self.clist.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
         for name, a3 in gaz.country_choices():
             it = QListWidgetItem(name)
-            it.setData(Qt.UserRole, a3)
+            it.setData(Qt.ItemDataRole.UserRole, a3)
             self.clist.addItem(it)
         self.clist.setMaximumHeight(150)
         self.terr = QCheckBox("Include distant islands / overseas territories in the extent")
@@ -469,7 +469,7 @@ class AreaPage(_Page):
             grid.addWidget(sp, 1, i)
         lay.addLayout(grid)
         self.canvas_btn = QPushButton("Use current map canvas extent")
-        lay.addWidget(self.canvas_btn, 0, Qt.AlignLeft)
+        lay.addWidget(self.canvas_btn, 0, Qt.AlignmentFlag.AlignLeft)
         self.filter.textChanged.connect(self._filter)
         self.canvas_btn.clicked.connect(self._canvas_extent)
         self.group.buttonClicked.connect(lambda *_: self._enable())
@@ -503,12 +503,12 @@ class AreaPage(_Page):
     def initializePage(self):
         agg = self.wiz.agg
         if agg and agg.locs and self.clist.selectedItems() == []:
-            xs = [l.lon for l in agg.locs]
+            xs = [lc.lon for lc in agg.locs]
             span = max(xs) - min(xs)
-            codes = {l.adm0 for l in agg.locs if l.adm0}
+            codes = {lc.adm0 for lc in agg.locs if lc.adm0}
             if len(codes) == 1:
                 for i in range(self.clist.count()):
-                    if self.clist.item(i).data(Qt.UserRole) in codes:
+                    if self.clist.item(i).data(Qt.ItemDataRole.UserRole) in codes:
                         self.clist.item(i).setSelected(True)
                 self.g_countries.setChecked(True)
             elif span < 60:
@@ -521,7 +521,7 @@ class AreaPage(_Page):
         a = cfg.area
         a.mode = ("global", "region", "countries", "data", "custom")[max(0, self.group.checkedId())]
         a.region = self.region.currentText()
-        a.countries = [it.data(Qt.UserRole) for it in self.clist.selectedItems()]
+        a.countries = [it.data(Qt.ItemDataRole.UserRole) for it in self.clist.selectedItems()]
         a.include_territories = self.terr.isChecked()
         a.exclude_antarctica = self.antarctica.isChecked()
         a.bbox = [sp.value() for sp in self.bb]
@@ -535,7 +535,7 @@ class AreaPage(_Page):
         if a.region and self.region.findText(a.region) >= 0:
             self.region.setCurrentText(a.region)
         for i in range(self.clist.count()):
-            self.clist.item(i).setSelected(self.clist.item(i).data(Qt.UserRole) in a.countries)
+            self.clist.item(i).setSelected(self.clist.item(i).data(Qt.ItemDataRole.UserRole) in a.countries)
         self.terr.setChecked(a.include_territories)
         for sp, v in zip(self.bb, a.bbox):
             sp.setValue(v)
@@ -567,9 +567,9 @@ class StylePage(_Page):
         for k, (label, *_r) in BASEMAPS.items():
             self.base.addItem(label, k)
         self.base_layer = QgsMapLayerComboBox()
-        self.base_layer.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.base_layer.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         self.base_layer.setEnabled(False)
-        self.base_op = QSlider(Qt.Horizontal)
+        self.base_op = QSlider(Qt.Orientation.Horizontal)
         self.base_op.setRange(10, 100)
         self.base_op.setValue(100)
         self.base_gray = QCheckBox("Convert basemap to greyscale")
@@ -596,7 +596,7 @@ class StylePage(_Page):
         self.single.setColor(QColor("#3b6fb6"))
         self.max_size = QDoubleSpinBox(); self.max_size.setRange(4, 40); self.max_size.setValue(12); self.max_size.setSuffix(" mm")
         self.min_size = QDoubleSpinBox(); self.min_size.setRange(0.8, 6); self.min_size.setValue(1.6); self.min_size.setSingleStep(0.2); self.min_size.setSuffix(" mm")
-        self.opacity = QSlider(Qt.Horizontal); self.opacity.setRange(20, 100); self.opacity.setValue(75)
+        self.opacity = QSlider(Qt.Orientation.Horizontal); self.opacity.setRange(20, 100); self.opacity.setValue(75)
         self.max_groups = QSpinBox(); self.max_groups.setRange(2, 20); self.max_groups.setValue(12)
         self.labels = QComboBox()
         self.labels.addItem("Numbers beside circles (avoid overlaps)", "beside")
@@ -655,9 +655,9 @@ class StylePage(_Page):
         self.extra.clear()
         for lyr in QgsProject.instance().mapLayers().values():
             it = QListWidgetItem(lyr.name())
-            it.setData(Qt.UserRole, lyr.id())
-            it.setFlags(it.flags() | Qt.ItemIsUserCheckable)
-            it.setCheckState(Qt.Unchecked)
+            it.setData(Qt.ItemDataRole.UserRole, lyr.id())
+            it.setFlags(it.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+            it.setCheckState(Qt.CheckState.Unchecked)
             self.extra.addItem(it)
         d = self.wiz.cfg_data()
         ok = d.loc_mode in ("country", "admin1")
@@ -684,8 +684,8 @@ class StylePage(_Page):
         s.background = self.bg.color().name()
         s.show_countries, s.show_admin1 = self.b_countries.isChecked(), self.b_admin1.isChecked()
         s.mask_outside, s.graticule = self.b_mask.isChecked(), self.b_grat.isChecked()
-        s.extra_layers = [self.extra.item(i).data(Qt.UserRole) for i in range(self.extra.count())
-                          if self.extra.item(i).checkState() == Qt.Checked]
+        s.extra_layers = [self.extra.item(i).data(Qt.ItemDataRole.UserRole) for i in range(self.extra.count())
+                          if self.extra.item(i).checkState() == Qt.CheckState.Checked]
         s.ramp, s.classes, s.class_method = self.ramp.currentText(), self.classes.value(), self.cmethod.currentData()
         a = cfg.area
         a.crs_mode = self.crs.currentData()
@@ -734,10 +734,10 @@ class OutputPage(_Page):
         self.group_title.setPlaceholderText("(automatic: name of the category column)")
         self.size_title = QLineEdit("CIRCLE AREA = NUMBER OF STUDIES")
         self.note_prefix = QLineEdit("Studies without a mappable location")
-        for l, w in (("Title:", self.title), ("Subtitle:", self.subtitle), ("Key heading:", self.key_title),
+        for lc, w in (("Title:", self.title), ("Subtitle:", self.subtitle), ("Key heading:", self.key_title),
                      ("Category legend heading:", self.group_title), ("Size legend heading:", self.size_title),
                      ("Footnote for unmapped studies:", self.note_prefix)):
-            f.addRow(l, w)
+            f.addRow(lc, w)
         lay.addWidget(gt)
 
         gp = QGroupBox("Page")
@@ -767,7 +767,7 @@ class OutputPage(_Page):
 
         gx = QGroupBox("Export")
         f = QFormLayout(gx)
-        self.out_dir = QgsFileWidget(); self.out_dir.setStorageMode(QgsFileWidget.GetDirectory)
+        self.out_dir = QgsFileWidget(); self.out_dir.setStorageMode(QgsFileWidget.StorageMode.GetDirectory)
         self.out_dir.setFilePath(os.path.join(os.path.expanduser("~"), "EvidenceMaps"))
         self.base_name = QLineEdit("Figure_Evidence_Map")
         self.fmt = {k: QCheckBox(k.upper()) for k in ("png", "pdf", "svg", "tif")}
@@ -798,12 +798,6 @@ class OutputPage(_Page):
                             "a saved settings file lets you reproduce this exact figure later."))
         lay.addStretch(1)
         self.setFinalPage(True)
-
-    def initializePage(self):
-        d = self.wiz.cfg_data()
-        is_sum = d.value_mode == "sum"
-        if is_sum and "NUMBER OF STUDIES" in self.size_title.text():
-            pass
 
     def collect(self, cfg):
         lo, ex = cfg.layout, cfg.export
@@ -872,9 +866,9 @@ class ResultDialog(QDialog):
         self.cap.setReadOnly(False)
         lay.addWidget(self.cap, 1)
         bb = QDialogButtonBox()
-        cp = bb.addButton("Copy caption", QDialogButtonBox.ActionRole)
+        cp = bb.addButton("Copy caption", QDialogButtonBox.ButtonRole.ActionRole)
         cp.clicked.connect(lambda: QApplication.clipboard().setText(self.cap.toPlainText()))
-        bb.addButton(QDialogButtonBox.Close)
+        bb.addButton(QDialogButtonBox.StandardButton.Close)
         bb.rejected.connect(self.accept)
         lay.addWidget(bb)
 
@@ -885,7 +879,7 @@ class EvidenceWizard(QWizard):
         super().__init__(parent or iface.mainWindow())
         self.iface = iface
         self.setWindowTitle("Evidence Mapper – study distribution maps")
-        self.setWizardStyle(QWizard.ModernStyle)
+        self.setWizardStyle(QWizard.WizardStyle.ModernStyle)
         self.resize(900, 720)
         self.table = None
         self.agg = None
@@ -896,7 +890,7 @@ class EvidenceWizard(QWizard):
         self.p_out = OutputPage(self)
         for p in (self.p_data, self.p_fields, self.p_area, self.p_style, self.p_out):
             self.addPage(p)
-        self.setButtonText(QWizard.FinishButton, "Create map")
+        self.setButtonText(QWizard.WizardButton.FinishButton, "Create map")
         self._restore_last()
 
     # ---- config plumbing
@@ -946,39 +940,33 @@ class EvidenceWizard(QWizard):
                 cfg.export.out_dir = cfg.export.out_dir
                 self.p_style.restore(cfg)
                 self.p_out.restore(cfg)
-        except Exception:
-            pass
-
-    def initializePage_fields(self):
-        pass
-
-    def nextId(self):
-        return super().nextId()
+        except (ValueError, TypeError, KeyError) as exc:
+            log("Last settings not restored: %s" % exc)
 
     # ---- run
     def accept(self):
         cfg = self.collect()
         try:
             QSettings().setValue(SETTINGS_KEY, json.dumps(cfg.to_dict()))
-        except Exception:
-            pass
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        except (TypeError, ValueError) as exc:
+            log("Settings not remembered: %s" % exc)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         try:
             res = build_map(cfg, table=self.table, agg=self.agg)
         except Exception as exc:
             QApplication.restoreOverrideCursor()
             box = QMessageBox(self)
-            box.setIcon(QMessageBox.Warning)
+            box.setIcon(QMessageBox.Icon.Warning)
             box.setWindowTitle("Evidence Mapper")
             box.setText(str(exc))
             box.setDetailedText(traceback.format_exc())
-            box.exec_()
+            box.exec()
             return
         QApplication.restoreOverrideCursor()
         super().accept()
         if cfg.export.open_designer and res.layout is not None:
             try:
                 self.iface.openLayoutDesigner(res.layout)
-            except Exception:
-                pass
-        ResultDialog(res, self.iface.mainWindow()).exec_()
+            except Exception as exc:
+                log("Could not open the layout designer: %s" % exc)
+        ResultDialog(res, self.iface.mainWindow()).exec()

@@ -41,15 +41,15 @@ class EvidenceMapperPlugin:
         try:
             from .gui.wizard import EvidenceWizard
             self.wizard = EvidenceWizard(self.iface)
-            self.wizard.exec_()
+            self.wizard.exec()
         except Exception as exc:
             import traceback
             box = QMessageBox(self.iface.mainWindow())
-            box.setIcon(QMessageBox.Critical)
+            box.setIcon(QMessageBox.Icon.Critical)
             box.setWindowTitle("Evidence Mapper")
             box.setText("Evidence Mapper could not start: %s" % exc)
             box.setDetailedText(traceback.format_exc())
-            box.exec_()
+            box.exec()
 
     def open_samples(self):
         from qgis.PyQt.QtCore import QUrl

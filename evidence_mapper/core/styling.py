@@ -9,7 +9,7 @@ from qgis.core import (
     QgsMarkerSymbol, QgsFillSymbol, QgsCategorizedSymbolRenderer, QgsRendererCategory,
     QgsSingleSymbolRenderer, QgsRuleBasedRenderer, QgsGraduatedSymbolRenderer, QgsRendererRange,
     QgsFeatureRequest, QgsPalLayerSettings, QgsTextFormat, QgsTextBufferSettings,
-    QgsVectorLayerSimpleLabeling, QgsPropertyCollection, QgsWkbTypes, QgsLineSymbol)
+    QgsVectorLayerSimpleLabeling, QgsPropertyCollection, QgsLineSymbol)
 
 PALETTES = {
     "Okabe-Ito (colour-blind safe)": ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
@@ -45,7 +45,7 @@ def group_colors(groups, palette_name, max_groups):
     base = PALETTES.get(palette_name) or PALETTES["Okabe-Ito (colour-blind safe)"]
     shown = list(groups[:max_groups]) if len(groups) > max_groups else list(groups)
     cols = {}
-    n = len(shown)
+    len(shown)
     for i, g in enumerate(shown):
         if i < len(base):
             cols[g] = base[i]
@@ -117,11 +117,11 @@ def build_point_layer(locs, name="Evidence (bubbles)"):
                       QgsField("Lon", QVariant.Double), QgsField("Lat", QVariant.Double)])
     lyr.updateFields()
     feats = []
-    for l in locs:
+    for lc in locs:
         f = QgsFeature(lyr.fields())
-        f.setAttributes([l.id, l.name, getattr(l, "plot_group", l.group), float(l.value), l.n_rows,
-                         1 if l.mixed else 0, float(getattr(l, "size_mm", 3.0)), l.lon, l.lat])
-        f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(l.lon, l.lat)))
+        f.setAttributes([lc.id, lc.name, getattr(lc, "plot_group", lc.group), float(lc.value), lc.n_rows,
+                         1 if lc.mixed else 0, float(getattr(lc, "size_mm", 3.0)), lc.lon, lc.lat])
+        f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(lc.lon, lc.lat)))
         feats.append(f)
     pr.addFeatures(feats)
     lyr.updateExtents()
@@ -174,22 +174,19 @@ def style_labels(layer, mode, size_pt, font="Arial"):
     tf.setBuffer(buf)
     s.setFormat(tf)
     if mode == "inside":
-        s.placement = QgsPalLayerSettings.OverPoint
+        s.placement = QgsPalLayerSettings.Placement.OverPoint
     else:
-        s.placement = QgsPalLayerSettings.AroundPoint
+        s.placement = QgsPalLayerSettings.Placement.AroundPoint
         s.dist = 0.4
         props = QgsPropertyCollection()
-        props.setProperty(QgsPalLayerSettings.LabelDistance,
+        props.setProperty(QgsPalLayerSettings.Property.LabelDistance,
                           QgsProperty.fromExpression('"Size_mm" / 2.0 + 0.2'))
         s.setDataDefinedProperties(props)
     try:                                        # never silently drop a number
         from qgis.core import Qgis
         s.setOverlapHandling(Qgis.LabelOverlapHandling.AllowOverlapIfRequired)
     except Exception:
-        try:
-            s.displayAll = True
-        except Exception:
-            pass
+        s.displayAll = True
     layer.setLabeling(QgsVectorLayerSimpleLabeling(s))
     layer.setLabelsEnabled(True)
 
@@ -257,25 +254,25 @@ def build_choropleth_layer(locs, gaz, ramp, n_classes, method, opacity=0.9):
     pr.addAttributes([QgsField("Name", QVariant.String), QgsField("Value", QVariant.Double)])
     lyr.updateFields()
     feats = []
-    for l in locs:
+    for lc in locs:
         geom = None
-        if l.kind == "country" and l.key in gaz.by_a3:
-            geom = gaz.by_a3[l.key]["geom"]
-        elif l.kind == "admin1":
+        if lc.kind == "country" and lc.key in gaz.by_a3:
+            geom = gaz.by_a3[lc.key]["geom"]
+        elif lc.kind == "admin1":
             gaz._load_admin1()
             for r in gaz._admin1:
-                if r["key"] == l.key:
+                if r["key"] == lc.key:
                     geom = r["geom"]
                     break
         if geom is None:
             continue
         f = QgsFeature(lyr.fields())
-        f.setAttributes([l.name, float(l.value)])
+        f.setAttributes([lc.name, float(lc.value)])
         f.setGeometry(QgsGeometry(geom))
         feats.append(f)
     pr.addFeatures(feats)
     lyr.updateExtents()
-    breaks = class_breaks([l.value for l in locs], n_classes, method)
+    breaks = class_breaks([lc.value for lc in locs], n_classes, method)
     cols = ramp_colors(ramp, max(1, len(breaks)))
     ranges, legend = [], []
     for i, ((a, b), col) in enumerate(zip(breaks, cols)):
@@ -337,7 +334,7 @@ def build_graticule_layer(interval=30, lat_min=-90, lat_max=90):
     buf.setColor(QColor("#ffffff"))
     tf.setBuffer(buf)
     s.setFormat(tf)
-    s.placement = QgsPalLayerSettings.Line
+    s.placement = QgsPalLayerSettings.Placement.Line
     lyr.setLabeling(QgsVectorLayerSimpleLabeling(s))
     lyr.setLabelsEnabled(True)
     return lyr

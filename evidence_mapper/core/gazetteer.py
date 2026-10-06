@@ -4,7 +4,7 @@ import os
 import unicodedata
 import re
 
-from qgis.core import QgsVectorLayer, QgsGeometry, QgsPointXY, QgsRectangle
+from qgis.core import QgsVectorLayer, QgsGeometry, QgsRectangle
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 COUNTRIES_PATH = os.path.join(DATA_DIR, "countries.geojson")

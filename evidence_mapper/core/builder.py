@@ -1,14 +1,13 @@
 """Orchestrates a complete build: data -> layers -> layout -> export."""
 import os
 import re
-import traceback
 
-from qgis.PyQt.QtCore import QSize
 from qgis.core import (
     QgsProject, QgsVectorLayer, QgsRectangle, QgsCoordinateReferenceSystem, QgsCoordinateTransform,
-    QgsLayoutExporter, QgsVectorFileWriter, QgsRasterLayer, QgsPointXY, QgsCoordinateTransformContext)
+    QgsLayoutExporter, QgsVectorFileWriter)
 
 from . import styling
+from .util import log
 from .aggregate import aggregate, format_unmapped_note
 from .basemaps import BASEMAPS, make_basemap_layer
 from .gazetteer import Gazetteer, REGIONS, COUNTRIES_PATH, ADMIN1_PATH, WORLD_PATH
@@ -56,8 +55,8 @@ def resolve_area(area, gaz, locs):
         rect.grow(max(rect.width(), rect.height()) * pad)
         return rect, list(area.countries), False
     if area.mode == "data":
-        xs = [l.lon for l in locs]
-        ys = [l.lat for l in locs]
+        xs = [lc.lon for lc in locs]
+        ys = [lc.lat for lc in locs]
         rect = QgsRectangle(min(xs), min(ys), max(xs), max(ys))
         span = max(rect.width(), rect.height(), 4.0)
         rect.grow(span * 0.14 + (2.0 if max(rect.width(), rect.height()) < 4 else 0))
@@ -103,9 +102,9 @@ def _write_gpkg(layer, path, name):
     opts.driverName = "GPKG"
     opts.layerName = name
     if os.path.exists(path):
-        opts.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+        opts.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteLayer
     res = QgsVectorFileWriter.writeAsVectorFormatV3(layer, path, QgsProject.instance().transformContext(), opts)
-    if res[0] != QgsVectorFileWriter.NoError:
+    if res[0] != QgsVectorFileWriter.WriterError.NoError:
         raise RuntimeError("Could not write %s: %s" % (path, res[1]))
     return QgsVectorLayer("%s|layername=%s" % (path, name), layer.name(), "ogr")
 
@@ -144,7 +143,7 @@ def export_layout(layout, out_dir, base, formats, dpi):
             code = exp.exportToSvg(path, s)
         else:
             continue
-        if code == QgsLayoutExporter.Success:
+        if code == QgsLayoutExporter.ExportResult.Success:
             files.append(path)
         else:
             errors.append("Export to %s failed (code %s)." % (fmt.upper(), code))
@@ -177,37 +176,37 @@ def build_map(cfg, table=None, agg=None, geocoder=None, progress=None, is_cancel
     crs = pick_crs(cfg.area, ext4326, is_global)
     tr = QgsCoordinateTransform(QgsCoordinateReferenceSystem(WGS84), crs, project.transformContext())
     extent = tr.transformBoundingBox(ext4326)
-    inside = [l for l in locs if ext4326.xMinimum() <= l.lon <= ext4326.xMaximum()
-              and ext4326.yMinimum() <= l.lat <= ext4326.yMaximum()]
-    outside = [l for l in locs if l not in inside]
+    inside = [lc for lc in locs if ext4326.xMinimum() <= lc.lon <= ext4326.xMaximum()
+              and ext4326.yMinimum() <= lc.lat <= ext4326.yMaximum()]
+    outside = [lc for lc in locs if lc not in inside]
     outside_note = ""
     if outside:
         if not inside:
             raise ValueError("None of your locations falls inside the chosen study area. "
                              "Pick another area or 'Fit extent to my data'.")
-        rows_out = sum(l.n_rows for l in outside)
+        rows_out = sum(lc.n_rows for lc in outside)
         outside_note = "Outside the mapped area: %d studies in %d location(s)." % (rows_out, len(outside))
         res.warnings.append("%d location(s) with %d studies lie outside the chosen area and are not drawn "
                             "(e.g. %s). They are listed in the footnote and in the exported CSV."
-                            % (len(outside), rows_out, ", ".join(l.name for l in outside[:3])))
-        for l in outside:
-            l.id = 0
+                            % (len(outside), rows_out, ", ".join(lc.name for lc in outside[:3])))
+        for lc in outside:
+            lc.id = 0
         locs = inside
-        for i, l in enumerate(locs, 1):
-            l.id = i
+        for i, lc in enumerate(locs, 1):
+            lc.id = i
 
     # ---- groups, colours, sizes
     from collections import Counter
     group_totals = Counter()
-    for l in locs:
-        group_totals[l.group] += l.value
+    for lc in locs:
+        group_totals[lc.group] += lc.value
     ordered = [g for g, _ in sorted(group_totals.items(), key=lambda kv: (-kv[1], kv[0]))]
     single = (not cfg.data.group_field) or len(ordered) <= 1
     colors, others = styling.group_colors(ordered, st.palette, st.max_groups)
-    vmax = max(l.value for l in locs)
-    for l in locs:
-        l.plot_group = l.group if l.group in colors else "Other"
-        l.size_mm = styling.size_for(l.value, vmax, st.max_size_mm, st.min_size_mm)
+    vmax = max(lc.value for lc in locs)
+    for lc in locs:
+        lc.plot_group = lc.group if lc.group in colors else "Other"
+        lc.size_mm = styling.size_for(lc.value, vmax, st.max_size_mm, st.min_size_mm)
 
     # ---- output folder & persistence
     out_dir = ex.out_dir
@@ -217,8 +216,8 @@ def build_map(cfg, table=None, agg=None, geocoder=None, progress=None, is_cancel
     if gpkg and os.path.exists(gpkg):
         try:
             os.remove(gpkg)
-        except OSError:
-            pass
+        except OSError as exc:
+            log("Could not remove old %s: %s" % (gpkg, exc))
 
     # ---- layers (top -> bottom)
     layers = []
@@ -267,8 +266,8 @@ def build_map(cfg, table=None, agg=None, geocoder=None, progress=None, is_cancel
             if st.basemap_gray:
                 try:
                     basemap.hueSaturationFilter().setSaturation(-100)
-                except Exception:
-                    pass
+                except Exception as exc:
+                    log("Greyscale filter not applied: %s" % exc)
     world_scale = is_global or ext4326.width() > 60 or ext4326.height() > 60
     graticule_layer = False
     if st.graticule and world_scale:
@@ -286,7 +285,6 @@ def build_map(cfg, table=None, agg=None, geocoder=None, progress=None, is_cancel
     styling.style_world_inset(world)
 
     # ---- register in the project inside one group
-    stamp = _slug(lo.title)[:40]
     root = project.layerTreeRoot()
     group = root.insertGroup(0, "Evidence Mapper – " + (lo.title[:50] or "map"))
     for lyr in layers + [world]:
@@ -309,9 +307,9 @@ def build_map(cfg, table=None, agg=None, geocoder=None, progress=None, is_cancel
     ctx.choropleth_legend = legend_choro
     ctx.is_global = is_global
     ctx.basemap_attr = attr
-    ctx.subtitle = default_subtitle(cfg, agg, sum(l.n_rows for l in locs) if outside else None)
+    ctx.subtitle = default_subtitle(cfg, agg, sum(lc.n_rows for lc in locs) if outside else None)
     ctx.note = (format_unmapped_note(agg, lo.note_prefix) + " " + outside_note).strip()
-    ctx.mixed_any = any(l.mixed for l in locs)
+    ctx.mixed_any = any(lc.mixed for lc in locs)
     ctx.world_layer = world
     ctx.single_group = single
     ctx.single_color = st.single_color
@@ -349,8 +347,8 @@ def _write_csv(path, agg):
     with open(path, "w", newline="", encoding="utf-8-sig") as fh:
         w = csv.writer(fh)
         w.writerow(["ID", "Name", "Category", "Value", "Rows", "Mixed_categories", "Lon", "Lat"])
-        for l in agg.locs:
-            w.writerow([l.id or "", l.name, l.group, l.value, l.n_rows, int(l.mixed), round(l.lon, 5), round(l.lat, 5)])
+        for lc in agg.locs:
+            w.writerow([lc.id or "", lc.name, lc.group, lc.value, lc.n_rows, int(lc.mixed), round(lc.lon, 5), round(lc.lat, 5)])
         if agg.unmapped:
             w.writerow([])
             w.writerow(["Unmapped reason", "Rows"])

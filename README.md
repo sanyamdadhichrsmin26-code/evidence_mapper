@@ -21,7 +21,7 @@ legends + scale bar + north arrow + locator inset + footnote) as a QGIS print la
 - Everything remains editable in the QGIS layout designer.
 
 ## Install
-**From a zip:** `Plugins ▸ Manage and Install Plugins ▸ Install from ZIP` → choose `evidence_mapper-1.0.1.zip`.
+**From a zip:** `Plugins ▸ Manage and Install Plugins ▸ Install from ZIP` → choose `evidence_mapper-1.0.2.zip`.
 **From the official repository** (after publication): search for *Evidence Mapper*.
 
 ## Quick start
@@ -57,6 +57,6 @@ Multi-country studies: `India; Kenya` (split on `;` or `|`).
 ## Develop / release
 ```
 python3 scripts/package_plugin.py          # -> dist/evidence_mapper-<version>.zip
-QT_QPA_PLATFORM=offscreen python3 -m pytest evidence_mapper/tests
+QT_QPA_PLATFORM=offscreen python3 -m pytest tests
 ```
 Tag `vX.Y.Z` to publish a GitHub release automatically. GPL-2.0-or-later.

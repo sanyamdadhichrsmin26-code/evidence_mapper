@@ -51,16 +51,10 @@ def _clean(v):
     if v is None:
         return ""
     if hasattr(v, "isNull"):
-        try:
-            if v.isNull():
-                return ""
-        except Exception:
-            pass
+        if v.isNull():
+            return ""
     if hasattr(v, "toString") and not isinstance(v, str):
-        try:
-            return v.toString()
-        except Exception:
-            pass
+        return v.toString()
     if isinstance(v, float) and v.is_integer():
         return str(int(v))
     return str(v).strip()
